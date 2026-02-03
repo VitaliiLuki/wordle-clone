@@ -1,7 +1,6 @@
-1. Create hooks to take exact fields from $state.
-2. Create hook to take exact reducers from action.
-3. Check how many time we subscribe on state to be sure.
-4. Resolve vm type narrowing on vm provided by viewModelContext.
-5. Check VM logic once again, maybe can simplify.
-6. Move picking random word logic out of VM to state lvl. (Effects)
-7. Think about next steps how to provide user choices and hide enter button when choice is provided.
+Think how to provide to VM context different view models and pick them from useContext by vm identifier.
+- Create hooks to take exact fields from $state.
+- Create hook to take exact reducers from action.
+- Resolve vm type narrowing on vm provided by viewModelContext.
+- Check VM logic once again, maybe can simplify.
+- Think about next steps how to provide user choices and hide enter button when choice is provided.

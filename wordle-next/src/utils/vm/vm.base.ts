@@ -1,14 +1,14 @@
 import { Observable, Subscription } from "rxjs";
 import { createSubjectHandler } from "../rxjs.utils";
-import { MutationsForState } from "./abstract";
+import { MutationsForState, StateEffects } from "./abstract";
 
 type ActionPayloadMap = Record<string, any>;
 
 export type VMDispatch<TPayloads extends ActionPayloadMap> = <
-	K extends keyof TPayloads
+	K extends keyof TPayloads,
 >(
 	type: K,
-	payload: TPayloads[K]
+	payload: TPayloads[K],
 ) => void;
 
 export type StateActions<TPayloads extends ActionPayloadMap> = {
@@ -17,18 +17,18 @@ export type StateActions<TPayloads extends ActionPayloadMap> = {
 
 export abstract class ViewModelBase<
 	TState extends Record<string, unknown>,
-	TPayloads extends ActionPayloadMap
+	TPayloads extends ActionPayloadMap,
 > {
 	protected abstract reducers: MutationsForState<TState, TPayloads>;
 	protected abstract initialState: TState;
+	protected abstract stateEffects: StateEffects<TState>;
 
-	// Можно оставить Subject, но тогда currentState обязателен
 	stateHandler = createSubjectHandler<TState>();
 
 	private currentState!: TState;
 
 	private mainSubscriptions = new Subscription();
-	private loaded = false;
+	private vmLoaded = false;
 
 	private _actions?: StateActions<TPayloads>;
 
@@ -39,22 +39,23 @@ export abstract class ViewModelBase<
 
 	/** VM lifecycle */
 	load() {
-		if (this.loaded) return;
-		this.loaded = true;
-		this.onLoad(this.mainSubscriptions);
+		if (this.vmLoaded) return;
+		this.vmLoaded = true;
+		this.onLoad();
 	}
 
 	unload() {
-		if (!this.loaded) return;
-		this.loaded = false;
+		if (!this.vmLoaded) return;
+		this.vmLoaded = false;
 
-		this.mainSubscriptions.unsubscribe();
-		this.mainSubscriptions = new Subscription();
+		// this.mainSubscriptions.unsubscribe();
+		// this.mainSubscriptions = new Subscription();
 
 		this.onUnload();
 	}
 
-	protected onLoad(_subs: Subscription) {}
+	// protected onLoad(_subs: Subscription) {}
+	protected onLoad() {}
 	protected onUnload() {}
 
 	get state$(): Observable<TState> {
@@ -73,8 +74,14 @@ export abstract class ViewModelBase<
 	/** core dispatch */
 	dispatch: VMDispatch<TPayloads> = (type, payload) => {
 		const reducer = this.reducers[type];
-		const next = reducer(this.getState(), payload);
-		this.setState(next);
+		const updatedState = reducer(this.getState(), payload);
+		const updatedStateAfterEffects = this.stateEffects.reduce(
+			(prev, curr) => {
+				return curr.project(prev);
+			},
+			updatedState,
+		);
+		this.setState(updatedStateAfterEffects);
 	};
 
 	/** actions(payload) facade */
@@ -93,6 +100,6 @@ export abstract class ViewModelBase<
 
 	/** helper: track AbortController in subscriptions */
 	protected trackAbort(controller: AbortController) {
-		this.mainSubscriptions.add(() => controller.abort());
+		// this.mainSubscriptions.add(() => controller.abort());
 	}
 }

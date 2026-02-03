@@ -1,22 +1,6 @@
-import { constVoid } from "@/src/utils/function.utils";
-import { WordleState, WorldeMutations } from "./abstract";
-import { MutationsForState } from "@/src/utils/vm/abstract";
-import { generateInitialChoices } from "./utils";
-
-export const START_COL_INDEX = 0;
-export const END_COL_INDEX = 4;
-export const WORDS_LIST_URL =
-	"https://raw.githubusercontent.com/tabatkins/wordle-list/main/words";
-
-// need data fetch + state update with fetch data
-// effect which checks and populates random word
-
-export const WORLDE_STATE_SEED: WordleState = {
-	words: [],
-	userChoices: generateInitialChoices(),
-	randomWord: "",
-	focusCell: { rowIdx: 0, colIdx: 0 },
-};
+import { MutationsForState, StateEffects } from "@/src/utils/vm/abstract";
+import { WordleState, WorldeMutations } from "./worlde.abstract";
+import { END_COL_INDEX, START_COL_INDEX } from "./worlde.fixtures";
 
 export const WORDLE_REDUCERS_SEED: MutationsForState<
 	WordleState,
@@ -50,3 +34,23 @@ export const WORDLE_REDUCERS_SEED: MutationsForState<
 	},
 	setRandomWord: (state, { randomWord }) => ({ ...state, randomWord }),
 };
+
+export const WORDLE_STATE_EFFECTS: StateEffects<WordleState> = [
+	{
+		name: "Populate random word",
+		project: (state) => {
+			if (!state.randomWord && state.words.length > 0) {
+				const idx = Math.floor(Math.random() * state.words.length);
+				return { ...state, randomWord: state.words[idx] };
+			}
+			return state;
+		},
+	},
+	{
+		name: "debg",
+		project: (state) => {
+			console.log("XXX state", state);
+			return state;
+		},
+	},
+];

@@ -1,11 +1,8 @@
-import { Dispatch, SetStateAction } from "react";
-
-const WORDS_LIST_URL =
-	"https://raw.githubusercontent.com/tabatkins/wordle-list/main/words";
+import { WORDS_LIST_URL } from "./worlde.fixtures";
 
 export const fetchWords = async (
 	controller: AbortController,
-	setter: Dispatch<SetStateAction<string[] | undefined>>
+	setter: (payload: { words: string[] }) => void,
 ) => {
 	try {
 		const res = await fetch(WORDS_LIST_URL, { signal: controller.signal });
@@ -18,7 +15,7 @@ export const fetchWords = async (
 			.map((word) => word.trim())
 			.filter(Boolean);
 
-		setter(wordsList);
+		setter({ words: wordsList });
 	} catch (e) {
 		if ((e as Error).name !== "AbortError") {
 			console.error("Word list fetch error:", e);
@@ -32,7 +29,7 @@ export const fetchWords = async (
  */
 export const generateInitialChoices = (rows = 6, cols = 5) => {
 	return Array.from({ length: rows }, () =>
-		Array.from({ length: cols }, () => "")
+		Array.from({ length: cols }, () => ""),
 	);
 };
 

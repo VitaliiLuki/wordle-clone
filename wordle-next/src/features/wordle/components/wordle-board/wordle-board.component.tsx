@@ -4,7 +4,7 @@ import { isVerifiedKeyDown } from "@/src/context/utils";
 import { ChoicePosition, FocusAction } from "@/src/context/abstract";
 import { constVoid } from "@/src/utils/function.utils";
 import { ViewModelContext } from "@/src/utils/context/view-model.context";
-import { WorldeViewModel } from "@/src/features/view-model/worlde.view-model";
+import { WorldeViewModel } from "@/src/features/wordle/view-model/worlde.view-model";
 
 const hotKeyActionMapper: Record<string, FocusAction> = {
 	Tab: "next",
