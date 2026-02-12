@@ -2,20 +2,28 @@ export type ChoicePosition = { rowIdx: number; colIdx: number };
 
 export type FocusAction = "next" | "prev";
 
+export type Row = {
+	id: number;
+	choices: Array<string>;
+	submitted: boolean;
+	errors: Array<string>;
+};
+
 export type WordleState = {
 	words: string[];
-	userChoices: (string | undefined)[][];
+	rows: Array<Row>;
 	randomWord: string;
 	focusCell: { rowIdx: number; colIdx: number };
 };
 
 export type WorldeMutations = {
-	writeUserChoice: {
+	changeRow: {
 		indexes: { rowIdx: number; colIdx: number };
-		letter: string | undefined;
+		letter: string;
 	};
 	changeFocus: { action: FocusAction };
 
 	setWords: { words: string[] };
 	setRandomWord: { randomWord: string };
+	submitRow: { rowIdx: number };
 };

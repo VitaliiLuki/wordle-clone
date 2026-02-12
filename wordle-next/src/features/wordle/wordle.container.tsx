@@ -12,13 +12,13 @@ export const WordleContainer: FC = () => {
 	const { state$ } = ctx as WorldeViewModel;
 
 	const state = useObservable(state$, WORLDE_STATE_SEED);
-	const { userChoices, focusCell } = state;
+	const { rows, focusCell } = state;
 
 	return (
 		<>
 			<header>Wordle Game</header>
 			<main className={styles.mainSection}>
-				<WordleBoard userChoices={userChoices} focusCell={focusCell} />
+				<WordleBoard rows={rows} focusCell={focusCell} />
 			</main>
 			<footer>General Info...</footer>
 		</>

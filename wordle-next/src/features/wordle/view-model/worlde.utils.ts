@@ -1,3 +1,4 @@
+import { Row } from "./worlde.abstract";
 import { WORDS_LIST_URL } from "./worlde.fixtures";
 
 export const fetchWords = async (
@@ -24,13 +25,15 @@ export const fetchWords = async (
 };
 
 /**
- * Generates an initial 2D array representing the user's choices in the Wordle game.
- * Each cell is initialized to `undefined`.
+ * Generates an initial 2D array for rows .
  */
-export const generateInitialChoices = (rows = 6, cols = 5) => {
-	return Array.from({ length: rows }, () =>
-		Array.from({ length: cols }, () => ""),
-	);
+export const generateInitialRows = (rows = 6, cols = 5): Array<Row> => {
+	return Array.from({ length: rows }, (_, rowIdx) => ({
+		id: rowIdx,
+		choices: Array.from({ length: cols }, () => ""),
+		submitted: false,
+		errors: [],
+	}));
 };
 
 const isEnglishLetter = /^[a-z]$/i;

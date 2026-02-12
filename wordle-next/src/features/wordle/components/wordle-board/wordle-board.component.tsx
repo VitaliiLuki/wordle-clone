@@ -5,6 +5,7 @@ import { ChoicePosition, FocusAction } from "@/src/context/abstract";
 import { constVoid } from "@/src/utils/function.utils";
 import { ViewModelContext } from "@/src/utils/context/view-model.context";
 import { WorldeViewModel } from "@/src/features/wordle/view-model/worlde.view-model";
+import { Row } from "../../view-model/worlde.abstract";
 
 const hotKeyActionMapper: Record<string, FocusAction> = {
 	Tab: "next",
@@ -13,11 +14,20 @@ const hotKeyActionMapper: Record<string, FocusAction> = {
 };
 
 const BoardCell: FC<{
-	letter: string | undefined;
+	letter: string;
 	isFocused?: boolean;
-	handleChoice: (letter: string | undefined) => void;
+	row: Row;
+	handleChoice: (letter: string) => void;
 	handleChangeFocus: (action: FocusAction) => void;
-}> = ({ letter, isFocused = false, handleChoice, handleChangeFocus }) => {
+	handleSubmit: () => void;
+}> = ({
+	row,
+	letter,
+	isFocused = false,
+	handleChoice,
+	handleChangeFocus,
+	handleSubmit,
+}) => {
 	const cellRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -37,8 +47,12 @@ const BoardCell: FC<{
 					handleChangeFocus("next");
 				}
 
+				if (event.key === "Enter") {
+					handleSubmit();
+				}
+
 				if (event.key === "Backspace") {
-					handleChoice(undefined);
+					handleChoice("");
 				}
 
 				if (hotKeyActionMapper[event.key]) {
@@ -54,24 +68,21 @@ const BoardCell: FC<{
 };
 
 type WordleBoardProps = {
-	userChoices: (string | undefined)[][];
+	rows: Array<Row>;
 	focusCell: ChoicePosition;
 };
 
-export const WordleBoard: FC<WordleBoardProps> = ({
-	userChoices,
-	focusCell,
-}) => {
+export const WordleBoard: FC<WordleBoardProps> = ({ rows, focusCell }) => {
 	const ctx = useContext(ViewModelContext);
 
 	const { actions } = ctx as WorldeViewModel;
-	const { changeFocus, writeUserChoice } = actions;
+	const { changeFocus, changeRow, submitRow } = actions;
 
 	const handleChoice = useCallback(
-		(rowIdx: number, colIdx: number) => (letter: string | undefined) => {
-			writeUserChoice({ indexes: { rowIdx, colIdx }, letter });
+		(rowIdx: number, colIdx: number) => (letter: string) => {
+			changeRow({ indexes: { rowIdx, colIdx }, letter });
 		},
-		[writeUserChoice],
+		[changeRow],
 	);
 
 	const handleChangeFocus = useCallback(
@@ -83,37 +94,22 @@ export const WordleBoard: FC<WordleBoardProps> = ({
 
 	return (
 		<div className={styles.boardContainer}>
-			{userChoices.map((row, rowIdx) => (
+			{rows.map((row, rowIdx) => (
 				<div key={rowIdx} className={styles.row}>
-					{row.map((letter, colIdx) => (
+					{row.choices.map((letter, colIdx) => (
 						<BoardCell
 							key={colIdx}
 							letter={letter}
+							row={row}
 							isFocused={
 								focusCell.rowIdx === rowIdx &&
 								focusCell.colIdx === colIdx
 							}
 							handleChoice={handleChoice(rowIdx, colIdx)}
 							handleChangeFocus={handleChangeFocus}
+							handleSubmit={() => submitRow({ rowIdx })}
 						/>
 					))}
-					<div
-						className={styles.buttonContainer}
-						style={{
-							display: userChoices[rowIdx].every(
-								(letter) => letter,
-							)
-								? "block"
-								: "none",
-						}}
-					>
-						<button
-							className={styles.submitButton}
-							onClick={constVoid}
-						>
-							enter
-						</button>
-					</div>
 				</div>
 			))}
 		</div>
