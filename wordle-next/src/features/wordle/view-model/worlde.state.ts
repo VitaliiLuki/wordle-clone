@@ -60,7 +60,10 @@ export const WORDLE_REDUCERS_SEED: MutationsForState<
 				submitted: true,
 				errors: [NOT_IN_WORDS_LIST_ERROR],
 			};
-			return { ...state, rows: currentRows };
+			return {
+				...state,
+				rows: currentRows,
+			};
 		}
 
 		currentRows[rowIdx] = {
@@ -69,7 +72,11 @@ export const WORDLE_REDUCERS_SEED: MutationsForState<
 			errors: [],
 		};
 
-		return { ...state, rows: currentRows };
+		return {
+			...state,
+			rows: currentRows,
+			focusCell: { rowIdx: rowIdx + 1, colIdx: 0 },
+		};
 	},
 };
 

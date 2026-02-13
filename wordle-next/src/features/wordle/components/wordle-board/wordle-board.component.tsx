@@ -6,6 +6,7 @@ import { constVoid } from "@/src/utils/function.utils";
 import { ViewModelContext } from "@/src/utils/context/view-model.context";
 import { WorldeViewModel } from "@/src/features/wordle/view-model/worlde.view-model";
 import { Row } from "../../view-model/worlde.abstract";
+import classNames from "classnames";
 
 const hotKeyActionMapper: Record<string, FocusAction> = {
 	Tab: "next",
@@ -60,7 +61,9 @@ const BoardCell: FC<{
 				}
 			}}
 			tabIndex={0}
-			className={styles.cell}
+			className={classNames(styles.cell, {
+				[styles.error]: row.errors.length,
+			})}
 		>
 			{letter}
 		</div>

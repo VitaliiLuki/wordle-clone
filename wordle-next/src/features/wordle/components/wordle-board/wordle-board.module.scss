@@ -1,46 +1,50 @@
 .boardContainer {
-  display: grid;
-  grid-template-rows: repeat(6, 1fr);
-  grid-gap: 5px;
-  padding: 10px;
+	display: grid;
+	grid-template-rows: repeat(6, 1fr);
+	grid-gap: 5px;
+	padding: 10px;
 }
 
 .row {
-  position: relative;
-  display: grid;
-  grid-gap: 5px;
-  grid-template-columns: repeat(5, 1fr);
-  padding-right: 50px;
+	position: relative;
+	display: grid;
+	grid-gap: 5px;
+	grid-template-columns: repeat(5, 1fr);
+	padding-right: 50px;
 }
 
 .cell {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 52px;
-  height: 52px;
-  font-size: 16px;
-  font-weight: 700;
-  border: 2px solid #d3d6da;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 52px;
+	height: 52px;
+	font-size: 16px;
+	font-weight: 700;
+	border: 2px solid #d3d6da;
+}
+
+.error {
+	border: 1px solid #ff8da0;
 }
 
 .buttonContainer {
-  height: 100%;
-  position: absolute;
-  right: 0;
-  top: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+	height: 100%;
+	position: absolute;
+	right: 0;
+	top: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .submitButton {
-  border-radius: 3px;
-  padding: 5px 3px;
-  background-color: burlywood;
+	border-radius: 3px;
+	padding: 5px 3px;
+	background-color: burlywood;
 
-  &:hover {
-    background-color: rgb(138, 104, 60);
-    cursor: pointer;
-  }
+	&:hover {
+		background-color: rgb(138, 104, 60);
+		cursor: pointer;
+	}
 }
