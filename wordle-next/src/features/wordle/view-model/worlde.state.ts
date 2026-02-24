@@ -91,11 +91,11 @@ export const WORDLE_STATE_EFFECTS: StateEffects<WordleState> = [
 			return state;
 		},
 	},
-	{
-		name: "debg",
-		project: (state) => {
-			console.log("XXX state", state);
-			return state;
-		},
-	},
+	// {
+	// 	name: "debg",
+	// 	project: (state) => {
+	// 		console.log("XXX state", state);
+	// 		return state;
+	// 	},
+	// },
 ];

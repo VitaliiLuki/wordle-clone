@@ -1,4 +1,4 @@
-import { Observable, Subscription } from "rxjs";
+import { Observable, Subscription, Subject, pipe, filter } from "rxjs";
 import { createSubjectHandler } from "../rxjs.utils";
 import { MutationsForState, StateEffects } from "./abstract";
 
@@ -15,6 +15,18 @@ export type StateActions<TPayloads extends ActionPayloadMap> = {
 	[K in keyof TPayloads]: (payload: TPayloads[K]) => void;
 };
 
+export type ActionCall<TState, TPayloads extends ActionPayloadMap> = {
+	type: keyof TPayloads;
+	payload: TPayloads[keyof TPayloads];
+	previousState: TState;
+	currentState: TState;
+};
+
+export const guard = <K extends keyof any>(actionType: K) =>
+	pipe((call$: Observable<ActionCall<any, any>>) =>
+		call$.pipe(filter((call) => call.type === actionType)),
+	);
+
 export abstract class ViewModelBase<
 	TState extends Record<string, unknown>,
 	TPayloads extends ActionPayloadMap,
@@ -22,6 +34,8 @@ export abstract class ViewModelBase<
 	protected abstract reducers: MutationsForState<TState, TPayloads>;
 	protected abstract initialState: TState;
 	protected abstract stateEffects: StateEffects<TState>;
+
+	protected abstract effects: Observable<unknown>[];
 
 	stateHandler = createSubjectHandler<TState>();
 
@@ -32,6 +46,9 @@ export abstract class ViewModelBase<
 
 	private _actions?: StateActions<TPayloads>;
 
+	private actionCallsSubject = new Subject<ActionCall<TState, TPayloads>>();
+	public actionCalls$ = this.actionCallsSubject.asObservable();
+
 	init() {
 		this.currentState = this.initialState;
 		this.stateHandler.handle(this.currentState);
@@ -41,6 +58,12 @@ export abstract class ViewModelBase<
 	load() {
 		if (this.vmLoaded) return;
 		this.vmLoaded = true;
+
+		this.effects.forEach((effect) => {
+			const subscription = effect.subscribe();
+			this.mainSubscriptions.add(subscription);
+		});
+
 		this.onLoad();
 	}
 
@@ -48,13 +71,12 @@ export abstract class ViewModelBase<
 		if (!this.vmLoaded) return;
 		this.vmLoaded = false;
 
-		// this.mainSubscriptions.unsubscribe();
-		// this.mainSubscriptions = new Subscription();
+		this.mainSubscriptions.unsubscribe();
+		this.mainSubscriptions = new Subscription();
 
 		this.onUnload();
 	}
 
-	// protected onLoad(_subs: Subscription) {}
 	protected onLoad() {}
 	protected onUnload() {}
 
@@ -73,15 +95,26 @@ export abstract class ViewModelBase<
 
 	/** core dispatch */
 	dispatch: VMDispatch<TPayloads> = (type, payload) => {
+		const previousState = this.getState();
+
 		const reducer = this.reducers[type];
 		const updatedState = reducer(this.getState(), payload);
+
 		const updatedStateAfterEffects = this.stateEffects.reduce(
 			(prev, curr) => {
 				return curr.project(prev);
 			},
 			updatedState,
 		);
+
 		this.setState(updatedStateAfterEffects);
+
+		this.actionCallsSubject.next({
+			type,
+			payload,
+			previousState,
+			currentState: updatedStateAfterEffects,
+		});
 	};
 
 	/** actions(payload) facade */
@@ -96,10 +129,5 @@ export abstract class ViewModelBase<
 
 		this._actions = wrapped;
 		return wrapped;
-	}
-
-	/** helper: track AbortController in subscriptions */
-	protected trackAbort(controller: AbortController) {
-		// this.mainSubscriptions.add(() => controller.abort());
 	}
 }

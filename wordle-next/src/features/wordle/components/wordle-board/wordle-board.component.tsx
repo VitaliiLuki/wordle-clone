@@ -7,6 +7,7 @@ import { ViewModelContext } from "@/src/utils/context/view-model.context";
 import { WorldeViewModel } from "@/src/features/wordle/view-model/worlde.view-model";
 import { Row } from "../../view-model/worlde.abstract";
 import classNames from "classnames";
+import { showNotification } from "@/src/components/notification/notification";
 
 const hotKeyActionMapper: Record<string, FocusAction> = {
 	Tab: "next",
@@ -70,12 +71,11 @@ const BoardCell: FC<{
 	);
 };
 
-type WordleBoardProps = {
-	rows: Array<Row>;
-	focusCell: ChoicePosition;
-};
-
-export const WordleBoard: FC<WordleBoardProps> = ({ rows, focusCell }) => {
+const BoardRow: FC<{ row: Row; rowIdx: number; focusCell: ChoicePosition }> = ({
+	row,
+	rowIdx,
+	focusCell,
+}) => {
 	const ctx = useContext(ViewModelContext);
 
 	const { actions } = ctx as WorldeViewModel;
@@ -95,25 +95,50 @@ export const WordleBoard: FC<WordleBoardProps> = ({ rows, focusCell }) => {
 		[changeFocus],
 	);
 
+	const handleSubmit = useCallback(
+		(rowIdx: number) => {
+			submitRow({ rowIdx });
+		},
+		[submitRow, row],
+	);
+
+	return (
+		<div key={rowIdx} className={styles.row}>
+			{row.choices.map((letter, colIdx) => {
+				return (
+					<BoardCell
+						key={colIdx}
+						letter={letter}
+						row={row}
+						isFocused={
+							focusCell.rowIdx === rowIdx &&
+							focusCell.colIdx === colIdx
+						}
+						handleChoice={handleChoice(rowIdx, colIdx)}
+						handleChangeFocus={handleChangeFocus}
+						handleSubmit={() => handleSubmit(rowIdx)}
+					/>
+				);
+			})}
+		</div>
+	);
+};
+
+type WordleBoardProps = {
+	rows: Array<Row>;
+	focusCell: ChoicePosition;
+};
+
+export const WordleBoard: FC<WordleBoardProps> = ({ rows, focusCell }) => {
 	return (
 		<div className={styles.boardContainer}>
 			{rows.map((row, rowIdx) => (
-				<div key={rowIdx} className={styles.row}>
-					{row.choices.map((letter, colIdx) => (
-						<BoardCell
-							key={colIdx}
-							letter={letter}
-							row={row}
-							isFocused={
-								focusCell.rowIdx === rowIdx &&
-								focusCell.colIdx === colIdx
-							}
-							handleChoice={handleChoice(rowIdx, colIdx)}
-							handleChangeFocus={handleChangeFocus}
-							handleSubmit={() => submitRow({ rowIdx })}
-						/>
-					))}
-				</div>
+				<BoardRow
+					key={rowIdx}
+					row={row}
+					rowIdx={rowIdx}
+					focusCell={focusCell}
+				/>
 			))}
 		</div>
 	);

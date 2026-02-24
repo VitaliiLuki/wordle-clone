@@ -16,7 +16,7 @@ export const WordleContainer: FC = () => {
 
 	return (
 		<>
-			<header>Wordle Game</header>
+			<header className={styles.pageHeader}>Wordle Game</header>
 			<main className={styles.mainSection}>
 				<WordleBoard rows={rows} focusCell={focusCell} />
 			</main>

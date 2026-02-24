@@ -1,7 +1,9 @@
 import React, { FC } from "react";
+import { toast, ToastOptions, TypeOptions } from "react-toastify";
 
-export const Notification: FC<{ content: string | React.JSX.Element }> = ({
-	content,
-}) => {
-	return <span>{content}</span>;
+export const showNotification = (
+	content: string | React.JSX.Element,
+	options?: ToastOptions,
+) => {
+	toast(content, options);
 };

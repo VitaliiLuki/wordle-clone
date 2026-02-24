@@ -37,14 +37,3 @@
 	justify-content: center;
 	align-items: center;
 }
-
-.submitButton {
-	border-radius: 3px;
-	padding: 5px 3px;
-	background-color: burlywood;
-
-	&:hover {
-		background-color: rgb(138, 104, 60);
-		cursor: pointer;
-	}
-}

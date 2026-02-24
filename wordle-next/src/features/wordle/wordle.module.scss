@@ -1,6 +1,10 @@
 .mainSection {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-grow: 1;
+}
+
+.pageHeader {
+	height: 80px;
 }
