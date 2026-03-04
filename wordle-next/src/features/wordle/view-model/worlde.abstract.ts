@@ -2,9 +2,14 @@ export type ChoicePosition = { rowIdx: number; colIdx: number };
 
 export type FocusAction = "next" | "prev";
 
+export type Choice = {
+	value: string;
+	status?: "correct" | "present" | "absent";
+};
+
 export type Row = {
 	id: number;
-	choices: Array<string>;
+	choices: Array<Choice>;
 	submitted: boolean;
 	errors: Array<string>;
 };
@@ -24,6 +29,5 @@ export type WorldeMutations = {
 	changeFocus: { action: FocusAction };
 
 	setWords: { words: string[] };
-	setRandomWord: { randomWord: string };
 	submitRow: { rowIdx: number };
 };

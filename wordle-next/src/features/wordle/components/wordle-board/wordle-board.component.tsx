@@ -5,7 +5,7 @@ import { ChoicePosition, FocusAction } from "@/src/context/abstract";
 import { constVoid } from "@/src/utils/function.utils";
 import { ViewModelContext } from "@/src/utils/context/view-model.context";
 import { WorldeViewModel } from "@/src/features/wordle/view-model/worlde.view-model";
-import { Row } from "../../view-model/worlde.abstract";
+import { Choice, Row } from "../../view-model/worlde.abstract";
 import classNames from "classnames";
 import { showNotification } from "@/src/components/notification/notification";
 
@@ -16,7 +16,7 @@ const hotKeyActionMapper: Record<string, FocusAction> = {
 };
 
 const BoardCell: FC<{
-	letter: string;
+	choice: Choice;
 	isFocused?: boolean;
 	row: Row;
 	handleChoice: (letter: string) => void;
@@ -24,7 +24,7 @@ const BoardCell: FC<{
 	handleSubmit: () => void;
 }> = ({
 	row,
-	letter,
+	choice,
 	isFocused = false,
 	handleChoice,
 	handleChangeFocus,
@@ -63,10 +63,13 @@ const BoardCell: FC<{
 			}}
 			tabIndex={0}
 			className={classNames(styles.cell, {
+				[styles.correct]: choice.status === "correct",
+				[styles.present]: choice.status === "present",
+				[styles.absent]: choice.status === "absent",
 				[styles.error]: row.errors.length,
 			})}
 		>
-			{letter}
+			{choice.value}
 		</div>
 	);
 };
@@ -104,11 +107,11 @@ const BoardRow: FC<{ row: Row; rowIdx: number; focusCell: ChoicePosition }> = ({
 
 	return (
 		<div key={rowIdx} className={styles.row}>
-			{row.choices.map((letter, colIdx) => {
+			{row.choices.map((choice, colIdx) => {
 				return (
 					<BoardCell
 						key={colIdx}
-						letter={letter}
+						choice={choice}
 						row={row}
 						isFocused={
 							focusCell.rowIdx === rowIdx &&

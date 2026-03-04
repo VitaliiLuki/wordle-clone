@@ -30,7 +30,10 @@ export const fetchWords = async (
 export const generateInitialRows = (rows = 6, cols = 5): Array<Row> => {
 	return Array.from({ length: rows }, (_, rowIdx) => ({
 		id: rowIdx,
-		choices: Array.from({ length: cols }, () => ""),
+		choices: Array.from({ length: cols }, () => ({
+			value: "",
+			status: undefined,
+		})),
 		submitted: false,
 		errors: [],
 	}));
@@ -43,3 +46,20 @@ const isEnglishLetter = /^[a-z]$/i;
  */
 export const isVerifiedKeyDown = (keydown: string) =>
 	isEnglishLetter.test(keydown);
+
+/**
+ * Determines the status of a choice based on its value and position relative to the random word.
+ */
+export const getRowChoiceStatus = (
+	choiceValue: string,
+	randomWord: string,
+	colIdx: number,
+) => {
+	if (choiceValue === randomWord[colIdx]) {
+		return "correct";
+	}
+	if (randomWord.includes(choiceValue)) {
+		return "present";
+	}
+	return "absent";
+};
