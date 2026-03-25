@@ -13,4 +13,5 @@ export const WORLDE_STATE_SEED: WordleState = {
 	rows: generateInitialRows(),
 	randomWord: "",
 	focusCell: { rowIdx: 0, colIdx: 0 },
+	providedWord: undefined,
 };

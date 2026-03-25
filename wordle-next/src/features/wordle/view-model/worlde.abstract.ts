@@ -18,6 +18,7 @@ export type WordleState = {
 	words: string[];
 	rows: Array<Row>;
 	randomWord: string;
+	providedWord: string | undefined;
 	focusCell: { rowIdx: number; colIdx: number };
 };
 
@@ -30,4 +31,5 @@ export type WorldeMutations = {
 
 	setWords: { words: string[] };
 	submitRow: { rowIdx: number };
+	refresh: void;
 };

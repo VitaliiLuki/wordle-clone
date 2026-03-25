@@ -4,8 +4,9 @@ import {
 	END_COL_INDEX,
 	NOT_IN_WORDS_LIST_ERROR,
 	START_COL_INDEX,
+	WORLDE_STATE_SEED,
 } from "./worlde.fixtures";
-import { getRowChoiceStatus } from "./worlde.utils";
+import { generateInitialRows, getRowChoiceStatus } from "./worlde.utils";
 
 export const WORDLE_REDUCERS_SEED: MutationsForState<
 	WordleState,
@@ -96,6 +97,13 @@ export const WORDLE_REDUCERS_SEED: MutationsForState<
 			focusCell: { rowIdx: rowIdx + 1, colIdx: 0 },
 		};
 	},
+	refresh: (state) => {
+		return {
+			...WORLDE_STATE_SEED,
+			words: state.words,
+			rows: generateInitialRows(),
+		};
+	},
 };
 
 export const WORDLE_STATE_EFFECTS: StateEffects<WordleState> = [
@@ -107,6 +115,18 @@ export const WORDLE_STATE_EFFECTS: StateEffects<WordleState> = [
 				return { ...state, randomWord: state.words[idx] };
 			}
 			return state;
+		},
+	},
+	{
+		name: "Check if final word is submitted",
+		project: (state) => {
+			const choicesProvided = state.rows.every(
+				(row) => row.submitted && !row.errors.length,
+			);
+
+			if (!choicesProvided) return state;
+			const providedWord = state.rows[5].choices.join(",");
+			return { ...state, providedWord };
 		},
 	},
 	{
